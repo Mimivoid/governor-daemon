@@ -26,7 +26,7 @@ int main() {
 
 	printf("%d\n", ncpus);
 
-	const long tick_ms = 486; // ~1/2 Hz @ 512
+	const long tick_ms = 400; // ~1/2 Hz @ 512
     struct timespec ticks = {0, tick_ms * 1000000};
 
 	int getfreq = cpufreq_get_hardware_limits(0, &min_freq, &max_freq);
@@ -49,34 +49,37 @@ int main() {
 			printf("%s\n", policy->governor);
 			printf ("%d\n", current_freq);
 			// below 3633mhz set to powersave
-			if (current_freq < max_freq / 1.35) {
+			if (current_freq < max_freq / 1.2) {
 				cpufreq_modify_policy_governor(cpu_count, gov_save);
+			}
+			
+			// if below 4.1ghz set cstates to low freq
+			if (current_freq < max_freq / 1.2) {
 				for (int cstate_num = 0; cstate_num <= 4; ++cstate_num) {
 					cpuidle_state_disable(cpu_count, cstate_num, 1);
 				}
 			}
+
 			// below 4260mhz set to min freq
 			if (current_freq < max_freq / 1.15) {
 				cpufreq_modify_policy_min(cpu_count, min_freq);
-				for (int cstate_num = 1; cstate_num <= 10; ++cstate_num) {
-					cpuidle_state_disable(cpu_count, cstate_num, 0);
-				}
 			}
 
 			// above 3633mhz set to performance
-			if (current_freq > max_freq / 1.35) {
+			if (current_freq > max_freq / 1.2) {
 				cpufreq_modify_policy_governor(cpu_count, gov_perf);
+			}
+
+			// if above 4.1ghz set cstates to normal
+			if (current_freq > max_freq / 1.2) {
 				for (int cstate_num = 0; cstate_num <= 4; ++cstate_num) {
 					cpuidle_state_disable(cpu_count, cstate_num, 0);
 				}
 			}
 
 			// above 3760mhz then set min to 3602mhz
-			if (current_freq > max_freq / 1.15 ) {
-				cpufreq_modify_policy_min(cpu_count, max_freq / 2);
-				for (int cstate_num = 1; cstate_num <= 10; ++cstate_num) {
-					cpuidle_state_disable(cpu_count, cstate_num, 1);
-				}
+			if (current_freq > max_freq / 1.17) {
+				cpufreq_modify_policy_min(cpu_count, max_freq / 3);
 			}
 		}
 		printf("Done!\n");

@@ -78,8 +78,8 @@ int main() {
 			}
 
 			// above 3760mhz then set min to 3602mhz
-			if (current_freq > max_freq / 1.17) {
-				cpufreq_modify_policy_min(cpu_count, max_freq / 3);
+			if (current_freq > max_freq / 1.18) {
+				cpufreq_modify_policy_min(cpu_count, max_freq / 4);
 			}
 		}
 		printf("Done!\n");

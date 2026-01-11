@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <cpufreq.h>
 extern "C" {
@@ -29,7 +28,7 @@ int main() {
 	const long tick_ms = 410; // ~1/2 Hz @ 512
     struct timespec ticks = {0, tick_ms * 1000000};
 
-	int getfreq = cpufreq_get_hardware_limits(0, &min_freq, &max_freq);
+	cpufreq_get_hardware_limits(0, &min_freq, &max_freq);
 
 	char gov_perf[] = "performance";
 	char gov_save[] = "powersave";

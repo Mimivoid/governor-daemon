@@ -1,8 +1,7 @@
-#include <string>
-#include <cpufreq.h>
 extern "C" {
     #include <cpuidle.h>
 }
+#include <cpufreq.h>
 #include <hwloc.h>
 #include <time.h>
 
@@ -25,7 +24,7 @@ int main() {
 
 	printf("%d\n", ncpus);
 
-	const long tick_ms = 410; // ~1/2 Hz @ 512
+	const long tick_ms = 160; // ~1/2 Hz @ 512
     struct timespec ticks = {0, tick_ms * 1000000};
 
 	cpufreq_get_hardware_limits(0, &min_freq, &max_freq);
@@ -56,33 +55,24 @@ int main() {
 			}
 			
 			// if below 4.1ghz set cstates to low freq
-			if (current_freq < max_freq / 1.22) {
+			if (current_freq < max_freq / 1.24) {
 				for (int cstate_num = 0; cstate_num <= 15; ++cstate_num) {
 					cpuidle_state_disable(cpu_count, cstate_num, 0);
 				}
 			}
-
-			// below 4260mhz set to min freq
-			if (current_freq < max_freq / 1.15) {
-				cpufreq_modify_policy_min(cpu_count, min_freq);
-			}
-
+			
 			// above 3633mhz set to performance
 			if (current_freq > max_freq / 1.2) {
 				cpufreq_modify_policy_governor(cpu_count, gov_perf);
 			}
 
 			// if above 4.1ghz set cstates 7-15 disable
-			if (current_freq > max_freq / 1.22) {
+			if (current_freq > max_freq / 1.24) {
 				for (int cstate_num = 4; cstate_num <= 15; ++cstate_num) {
 					cpuidle_state_disable(cpu_count, cstate_num, 1);
 				}
 			}
 
-			// above 3760mhz then set min to 3602mhz
-			if (current_freq > max_freq / 1.17) {
-				cpufreq_modify_policy_min(cpu_count, max_freq / 4.4);
-			}
 		}
 		printf("Done!\n");
 

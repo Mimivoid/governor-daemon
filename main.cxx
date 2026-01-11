@@ -42,7 +42,6 @@ int main() {
 
 	while (true) {
 
-		printf("Looping!\n");
 		for (int cpu_count = 0; cpu_count < ncpus; cpu_count++) {
 			int current_freq = cpufreq_get_freq_kernel(cpu_count);
 			struct cpufreq_policy *policy;
@@ -74,7 +73,6 @@ int main() {
 			}
 
 		}
-		printf("Done!\n");
 
 		nanosleep(&ticks, NULL);
 
